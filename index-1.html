@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AmorEnCódigo ❤️</title>
+<style>
+:root{--pink:#ff4f91;--pink2:#ff85b5;--bg:#100b19;--card:#21152d;--text:#fff2f8;--muted:#cbb8d2}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text);background:radial-gradient(circle at top,#422044 0,#160e20 42%,#0c0912 100%);min-height:100vh}
+header{padding:28px 18px 18px;text-align:center}
+.logo{font-size:clamp(28px,6vw,44px);font-weight:900;letter-spacing:.3px;margin:0;text-shadow:0 0 24px #ff4f9166}
+header p{color:var(--muted);margin:8px auto 0;max-width:560px}
+main{width:min(1000px,92%);margin:0 auto 45px}
+.hero{background:linear-gradient(135deg,#ff4f9125,#a855f725);border:1px solid #ffffff20;border-radius:24px;padding:24px;text-align:center;box-shadow:0 18px 50px #0004}
+.hero h2{margin:0 0 8px;font-size:clamp(22px,4vw,32px)}
+.hero p{color:var(--muted);line-height:1.5}
+button,.button{border:0;border-radius:14px;background:linear-gradient(135deg,var(--pink),#c64dff);color:white;padding:12px 17px;font-weight:800;font-size:15px;cursor:pointer;text-decoration:none;display:inline-block}
+button:active,.button:active{transform:scale(.98)}
+.section-title{margin:28px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
+.card{background:#21152ddd;border:1px solid #ffffff17;border-radius:20px;padding:18px;box-shadow:0 10px 25px #0002}
+.card .emoji{font-size:38px}
+.card h3{margin:10px 0 6px}
+.card p{color:var(--muted);line-height:1.45;min-height:42px}
+.card button{width:100%}
+.admin{margin-top:32px}
+.admin details{background:#170f21;border:1px solid #ffffff20;border-radius:18px;padding:15px}
+summary{cursor:pointer;font-weight:800}
+form{display:grid;gap:10px;margin-top:14px}
+input,textarea{width:100%;padding:12px;border:1px solid #ffffff25;border-radius:12px;background:#0f0b16;color:white;font:inherit}
+textarea{min-height:85px;resize:vertical}
+.small{font-size:12px;color:var(--muted);line-height:1.45}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1 class="logo">❤️ AmorEnCódigo</h1>
+  <p>Detalles digitales para decir lo que a veces cuesta poner en palabras.</p>
+</header>
+<main>
+  <section class="hero">
+    <h2>Un detalle hecho con cariño 💌</h2>
+    <p>Personaliza una carta romántica, escribe tu mensaje y crea una sorpresa especial.</p>
+    <a class="button" href="carta.html">Crear mi carta ✨</a>
+  </section>
+
+  <h2 class="section-title">💗 Nuestro catálogo</h2>
+  <div class="grid" id="catalog">
+    <article class="card">
+      <div class="emoji">💌</div><h3>Carta romántica</h3>
+      <p>Un sobre animado que guarda un mensaje personalizado.</p>
+      <a class="button" href="carta.html">Personalizar</a>
+    </article>
+    <article class="card">
+      <div class="emoji">🌙</div><h3>Mensaje bajo la luna</h3>
+      <p>Una sorpresa tierna para dedicar a alguien especial.</p>
+      <a class="button" href="carta.html?tema=luna">Crear detalle</a>
+    </article>
+    <article class="card">
+      <div class="emoji">🐶</div><h3>Una carta sorpresa</h3>
+      <p>Una pequeña animación antes de revelar tu dedicatoria.</p>
+      <a class="button" href="carta.html?tema=sorpresa">Ver plantilla</a>
+    </article>
+  </div>
+
+  <section class="admin">
+    <details>
+      <summary>⚙️ Panel de administración (local)</summary>
+      <p class="small">Este panel es una demostración: los cambios se guardan solo en este navegador y no se sincronizan con otros visitantes. No uses una contraseña real aquí; un PIN dentro de HTML no protege un sitio público.</p>
+      <form id="adminForm">
+        <label for="pin">PIN de demostración</label>
+        <input id="pin" type="password" placeholder="Escribe el PIN de demostración" autocomplete="off" required>
+        <label for="title">Título de la nueva tarjeta</label>
+        <input id="title" placeholder="Ej. Carta de aniversario" required>
+        <label for="description">Descripción</label>
+        <textarea id="description" placeholder="Describe esta plantilla..." required></textarea>
+        <button type="submit">Añadir tarjeta</button>
+        <p id="status" class="small" aria-live="polite"></p>
+      </form>
+    </details>
+  </section>
+</main>
+<footer>Hecho con ❤️ y un poquito de código.</footer>
+<script>
+const DEMO_PIN = "Amor2026"; // Solo demostración. No es seguridad real.
+const catalog = document.getElementById("catalog");
+function addCard(title, description) {
+  const card = document.createElement("article");
+  card.className = "card";
+  const emoji = document.createElement("div"); emoji.className = "emoji"; emoji.textContent = "💖";
+  const heading = document.createElement("h3"); heading.textContent = title;
+  const paragraph = document.createElement("p"); paragraph.textContent = description;
+  const link = document.createElement("a"); link.className = "button"; link.href = "carta.html"; link.textContent = "Personalizar";
+  card.append(emoji, heading, paragraph, link); catalog.appendChild(card);
+}
+try {
+  const saved = JSON.parse(localStorage.getItem("aec_custom_cards") || "[]");
+  saved.forEach(item => addCard(item.title, item.description));
+} catch(e) {}
+document.getElementById("adminForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const status = document.getElementById("status");
+  if (document.getElementById("pin").value !== DEMO_PIN) {
+    status.textContent = "PIN incorrecto. Revisa el PIN de demostración.";
+    return;
+  }
+  const title = document.getElementById("title").value.trim();
+  const description = document.getElementById("description").value.trim();
+  if (!title || !description) return;
+  const item = {title, description};
+  try {
+    const saved = JSON.parse(localStorage.getItem("aec_custom_cards") || "[]");
+    saved.push(item);
+    localStorage.setItem("aec_custom_cards", JSON.stringify(saved));
+    addCard(title, description);
+    this.reset();
+    status.textContent = "Tarjeta añadida en este navegador. No aparecerá automáticamente a otros visitantes.";
+  } catch(err) {
+    status.textContent = "No se pudo guardar en este navegador.";
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Una carta para ti ❤️</title>
+<style>
+:root{--pink:#ff5797;--purple:#a855f7;--dark:#160c20;--cream:#fff8fc}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#54244c,#1b1028 48%,#0d0914);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:white;overflow-x:hidden}
+main{width:min(720px,92%);margin:auto;padding:25px 0 40px;position:relative;z-index:1}
+.panel{background:#ffffff0e;border:1px solid #ffffff22;border-radius:24px;padding:22px;text-align:center;box-shadow:0 20px 55px #0004;backdrop-filter:blur(8px)}
+h1{font-size:clamp(27px,6vw,40px);margin:6px 0 10px}
+p{line-height:1.6}
+.muted{color:#e4cfe5}
+button,a.btn{border:0;border-radius:14px;padding:12px 17px;background:linear-gradient(135deg,var(--pink),var(--purple));color:white;font-size:15px;font-weight:800;text-decoration:none;cursor:pointer;display:inline-block;margin:5px}
+.envelope{font-size:92px;animation:bob 2s ease-in-out infinite;filter:drop-shadow(0 10px 20px #ff579744)}
+@keyframes bob{50%{transform:translateY(-9px) rotate(2deg)}}
+.hidden{display:none!important}
+.progress-wrap{height:12px;border-radius:30px;background:#ffffff20;overflow:hidden;margin:18px 0}
+.progress{height:100%;width:0;background:linear-gradient(90deg,#ff5797,#ffd0e2);border-radius:30px;transition:width .08s}
+.dog{font-size:58px;animation:bob 1.2s ease-in-out infinite}
+.paper{background:var(--cream);color:#4b2441;border-radius:18px;padding:24px;text-align:left;box-shadow:0 14px 35px #0003;margin:16px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.paper h2{text-align:center;color:#d63384}
+.signature{text-align:right;font-weight:800;margin-top:18px}
+label{display:block;text-align:left;font-weight:700;margin:12px 0 5px}
+input,textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #ffffff35;background:#120b1b;color:white;font:inherit}
+textarea{min-height:125px;resize:vertical}
+.formbox{margin-top:20px;border-top:1px solid #ffffff22;padding-top:18px}
+.hearts{position:fixed;inset:0;overflow:hidden;pointer-events:none}
+.heart{position:absolute;bottom:-30px;opacity:.75;animation:floatUp linear forwards}
+@keyframes floatUp{to{transform:translateY(-110vh) rotate(360deg);opacity:0}}
+footer{text-align:center;color:#d7c0dc;font-size:12px;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="hearts" id="hearts"></div>
+<main>
+  <section class="panel" id="start">
+    <div class="envelope">💌</div>
+    <h1>Un regalo para ti ❤️</h1>
+    <p class="muted">Alguien preparó unas palabras especiales para ti.</p>
+    <button id="openBtn">Abrir mi regalo ✨</button>
+  </section>
+
+  <section class="panel hidden" id="loading">
+    <div class="dog">🐶💌</div>
+    <h1>Preparando tu carta...</h1>
+    <p class="muted">Un pequeño detalle viene en camino.</p>
+    <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+    <p id="percent">0%</p>
+  </section>
+
+  <section class="panel hidden" id="letter">
+    <div style="font-size:48px">💗</div>
+    <h1 id="shownTitle">Para alguien especial</h1>
+    <div class="paper">
+      <h2 id="paperTitle">Una carta para ti</h2>
+      <div id="shownMessage">Quería recordarte lo especial que eres para mí. Gracias por formar parte de mi vida y hacer que tantos momentos sean más bonitos. ❤️</div>
+      <div class="signature" id="shownSignature">Con cariño 💖</div>
+    </div>
+    <button id="editBtn">Personalizar mi carta ✍️</button>
+    <button id="againBtn">Volver al inicio ↩️</button>
+    <div class="formbox hidden" id="editor">
+      <h2>Personaliza tu regalo 💌</h2>
+      <label for="recipient">Nombre de quien recibe</label>
+      <input id="recipient" placeholder="Ej. Mi persona favorita">
+      <label for="sender">Tu nombre o apodo</label>
+      <input id="sender" placeholder="Ej. Tu niño">
+      <label for="message">Tu mensaje</label>
+      <textarea id="message" placeholder="Escribe aquí tu carta..."></textarea>
+      <button id="saveBtn">Guardar y ver carta ❤️</button>
+      <p class="muted" style="font-size:12px">La carta se guarda en este dispositivo. Para compartirla con otra persona mediante un enlace personalizado necesitaremos añadir almacenamiento o generar un enlace con los datos.</p>
+    </div>
+  </section>
+  <footer><a href="index.html" style="color:#ffc1dc">← Volver a AmorEnCódigo</a></footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const defaultMessage = "Quería recordarte lo especial que eres para mí. Gracias por formar parte de mi vida y hacer que tantos momentos sean más bonitos. ❤️";
+function show(which) { ["start","loading","letter"].forEach(id => $(id).classList.toggle("hidden", id !== which)); }
+$("openBtn").addEventListener("click", () => {
+  show("loading");
+  let value = 0;
+  const timer = setInterval(() => {
+    value = Math.min(100, value + 4);
+    $("progress").style.width = value + "%";
+    $("percent").textContent = value + "%";
+    if (value >= 100) {
+      clearInterval(timer);
+      show("letter");
+      burstHearts();
+    }
+  }, 120);
+});
+$("editBtn").addEventListener("click", () => {
+  $("editor").classList.toggle("hidden");
+  $("recipient").focus();
+});
+$("saveBtn").addEventListener("click", () => {
+  const recipient = $("recipient").value.trim() || "Alguien especial";
+  const sender = $("sender").value.trim() || "Con cariño";
+  const message = $("message").value.trim() || defaultMessage;
+  $("shownTitle").textContent = "Para " + recipient + " ❤️";
+  $("paperTitle").textContent = "Una carta para ti";
+  $("shownMessage").textContent = message;
+  $("shownSignature").textContent = "Con cariño, " + sender + " 💖";
+  try { localStorage.setItem("aec_letter", JSON.stringify({recipient,sender,message})); } catch(e) {}
+  $("editor").classList.add("hidden");
+  burstHearts();
+});
+$("againBtn").addEventListener("click", () => { show("start"); $("editor").classList.add("hidden"); });
+try {
+  const saved = JSON.parse(localStorage.getItem("aec_letter") || "null");
+  if (saved) {
+    $("recipient").value = saved.recipient || "";
+    $("sender").value = saved.sender || "";
+    $("message").value = saved.message || "";
+    $("shownTitle").textContent = "Para " + (saved.recipient || "Alguien especial") + " ❤️";
+    $("shownMessage").textContent = saved.message || defaultMessage;
+    $("shownSignature").textContent = "Con cariño, " + (saved.sender || "alguien especial") + " 💖";
+  }
+} catch(e) {}
+function burstHearts() {
+  const holder = $("hearts");
+  for (let i=0; i<15; i++) {
+    const h = document.createElement("span");
+    h.className = "heart";
+    h.textContent = ["💗","💖","💕","❤️","✨"][Math.floor(Math.random()*5)];
+    h.style.left = Math.random()*100 + "%";
+    h.style.fontSize = (16 + Math.random()*18) + "px";
+    h.style.animationDuration = (3 + Math.random()*3) + "s";
+    holder.appendChild(h);
+    setTimeout(() => h.remove(), 6500);
+  }
+}
+const params = new URLSearchParams(location.search);
+if (params.get("tema") === "luna") {
+  document.querySelector("#start h1").textContent = "Bajo la misma luna 🌙";
+  document.querySelector("#start p").textContent = "Aunque haya distancia, una misma luna puede acompañarnos.";
+}
+if (params.get("tema") === "sorpresa") {
+  document.querySelector("#start h1").textContent = "¡Tienes una sorpresa! 🐶";
+}
+</script>
+</body>
+</html>
